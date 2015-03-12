@@ -1,6 +1,6 @@
 #include "MyAntiAliasingView.h"
 #include "MyPrimitiveDrawer.h"
-#include "gl\glew.h"
+#include <GL/glew.h>
 
 // if this is too large
 // glRenderbufferStorage gives error 1281: invalid value

@@ -202,11 +202,12 @@
     </ClCompile>
     <ClCompile Include="My2DCellFillingAlgorithm.cpp" />
     <ClCompile Include="MyAntiAliasingView.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="MyBitmap.cpp" />
     <ClCompile Include="MyBoundingBox.cpp" />
+    <ClCompile Include="MyBoxKnot.cpp" />
     <ClCompile Include="myColor3.cpp" />
     <ClCompile Include="MyColorConverter.cpp" />
     <ClCompile Include="MyDataLoader.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="MyBitmap.h" />
     <ClInclude Include="MyBoundingBox.h" />
     <ClInclude Include="MyBox.h" />
+    <ClInclude Include="MyBoxKnot.h" />
     <ClInclude Include="myColor3.h" />
     <ClInclude Include="MyColor4.h" />
     <ClInclude Include="MyColorConverter.h" />

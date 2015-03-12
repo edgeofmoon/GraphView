@@ -226,7 +226,7 @@ void MyGraphicsTool::Vertices(const MyArray2f& vec){
 	}
 }
 
-void Normal(const MyVec3f& vec){
+void MyGraphicsTool::Normal(const MyVec3f& vec){
 	glNormal3f(vec[0],vec[1],vec[2]);
 }
 
@@ -244,6 +244,30 @@ void MyGraphicsTool::Color(const MyColor4f& color){
 
 void MyGraphicsTool::EndPrimitive(){
 	glEnd();
+}
+
+void MyGraphicsTool::DisableFaceCulling(){
+	glDisable(GL_CULL_FACE);
+}
+
+void MyGraphicsTool::EnableFaceCulling(){
+	glEnable(GL_CULL_FACE);
+}
+
+void MyGraphicsTool::FaceCullingMode(int modeByte){
+	switch (modeByte){
+		case 1:
+			glCullFace(GL_BACK);
+			break;
+		case 2:
+			glCullFace(GL_FRONT);
+			break;
+		case 3:
+			glCullFace(GL_FRONT_AND_BACK);
+			break;
+		default:
+			break;
+	}
 }
 
 void MyGraphicsTool::EnableAlplaBlending(){

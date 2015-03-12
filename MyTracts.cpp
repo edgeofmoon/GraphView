@@ -1,9 +1,12 @@
 #include "MyTracts.h"
+#include <algorithm>
 #define LARGENUMBER 999999
 
 MyTracts::MyTracts(void)
 	:mBox(MyVec3f(LARGENUMBER,LARGENUMBER,LARGENUMBER), MyVec3f(-LARGENUMBER,-LARGENUMBER,-LARGENUMBER))
 {
+	mValueMin = LARGENUMBER;
+	mValueMax = -LARGENUMBER;
 }
 
 
@@ -19,6 +22,8 @@ MyTracts& operator<< (MyTracts& tracts, const MyVec3f& coord){
 
 MyTracts& operator<< (MyTracts& tracts, const MyColor4f& color){
 	tracts.mColors.back() << color;
+	tracts.mValueMin = std::min(tracts.mValueMin, color.g);
+	tracts.mValueMax = std::max(tracts.mValueMax, color.g);
 	return tracts;
 }
 
@@ -41,6 +46,10 @@ const MyColor4f& MyTracts::GetColor(int i, int j) const{
 	return mColors[i][j];
 }
 
+const float MyTracts::GetValue(int i, int j) const{
+	return mColors[i][j].g;
+}
+
 int MyTracts::GetNumTracts() const{
 	return mCoords.size();
 }
@@ -56,6 +65,41 @@ int MyTracts::GetTotalNumVertices() const{
 	}
 	return n;
 }
+
+float MyTracts::GetMinValue() const{
+	return mValueMin;
+}
+
+float MyTracts::GetMaxValue() const{
+	return mValueMax;
+}
+
+float MyTracts::GetMinValue(const MyBoundingBox& box) const{
+	float minValue = mValueMax;
+	for (int i = 0; i < this->GetNumTracts(); i++){
+		for (int j = 0; j < this->GetNumVertices(i); j++){
+			if (box.IsIn(this->GetCoord(i, j))){
+				float value = this->GetValue(i, j);
+				minValue = std::min(minValue, value);
+			}
+		}
+	}
+	return minValue;
+}
+
+float MyTracts::GetMaxValue(const MyBoundingBox& box) const{
+	float maxValue = mValueMin;
+	for (int i = 0; i < this->GetNumTracts(); i++){
+		for (int j = 0; j < this->GetNumVertices(i); j++){
+			if (box.IsIn(this->GetCoord(i, j))){
+				float value = this->GetValue(i, j);
+				maxValue = std::max(maxValue, value);
+			}
+		}
+	}
+	return maxValue;
+}
+
 
 MyBoundingBox MyTracts::GetBoundingBox() const{
 	return mBox;

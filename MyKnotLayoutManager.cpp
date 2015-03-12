@@ -50,8 +50,8 @@ void MyKnotLayoutManager::initLayout(){
 		itrKnot != mKnotContainer->End();
 		itrKnot ++){
 		float x = (i - (n/2.f))*space+offset;
-		MyVec3f center(x+space/2,y,-distance);
-		//MyVec3f center(0,0,-distance);
+		MyVec3f center(x + space / 2, y, -distance);
+		//MyVec3f center(0, 0, -distance);
 		(*itrKnot)->SetToDefault();
 		(*itrKnot)->Scale(3);
 		(*itrKnot)->Translate(center);

@@ -6,13 +6,13 @@
 #include "MyUtility.h"
 #include "MyGraphicsTool.h"
 #include "MyPrimitiveDrawer.h"
+#include "MyBoxKnot.h"
 #include <iostream>
 using namespace std;
 
 MyTractsKnot::MyTractsKnot(void)
 {
 	mFaces = 6;
-	mRadius = 0.4;
 	mDrawBoundingBox = false;
 }
 
@@ -25,9 +25,23 @@ void MyTractsKnot::Show(){
 	MyGraphicsTool::PushMatrix();
 	MyGraphicsTool::LoadTrackBall(&mTrackBall);
 	//MyGraphicsTool::Sphere(10);
+
+	/*
+	MyBoundingBox box[2];
+	for (int i = 0; i < mChildren.size(); i++){
+		MyBoxKnot* knot = dynamic_cast<MyBoxKnot*>(mChildren[i]);
+		if (knot){
+			knot->Show();
+			box[i] = knot->GetBox();
+		}
+	}
+	*/
+
 	MyGraphicsTool::Translate(-mTracts->GetBoundingBox().GetCenter());
 
-	
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glBindVertexArray(mVertexArray);
 	glUseProgram(mShaderProgram);
 
@@ -41,10 +55,26 @@ void MyTractsKnot::Show(){
 	glGetFloatv(GL_PROJECTION_MATRIX, projMat);
 	glUniformMatrix4fv(projmatLocation, 1, GL_FALSE, projMat);
 
+	/*
+	int boxLowLocation1 = glGetUniformLocation(mShaderProgram, "boxLow1");
+	int boxHighLocation1 = glGetUniformLocation(mShaderProgram, "boxHigh1");
+	MyVec3f lowPos1 = box[0].GetLowPos()+mTracts->GetBoundingBox().GetCenter();
+	MyVec3f highPos1 = box[0].GetHighPos() + mTracts->GetBoundingBox().GetCenter();
+	glUniform3f(boxLowLocation1, lowPos1[0], lowPos1[1], lowPos1[2]);
+	glUniform3f(boxHighLocation1, highPos1[0], highPos1[1], highPos1[2]);
+
+	int boxLowLocation2 = glGetUniformLocation(mShaderProgram, "boxLow2");
+	int boxHighLocation2 = glGetUniformLocation(mShaderProgram, "boxHigh2");
+	MyVec3f lowPos2 = box[1].GetLowPos() + mTracts->GetBoundingBox().GetCenter();
+	MyVec3f highPos2 = box[1].GetHighPos() + mTracts->GetBoundingBox().GetCenter();
+	glUniform3f(boxLowLocation2, lowPos2[0], lowPos2[1], lowPos2[2]);
+	glUniform3f(boxHighLocation2, highPos2[0], highPos2[1], highPos2[2]);
+*/
+
 	glDrawElements(GL_TRIANGLES, mIndices.size()*3, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
 	glBindVertexArray(0);
-	
+	glDisable(GL_CULL_FACE);
 	MyGraphicsTool::PopMatrix();
 }
 void MyTractsKnot::Destory(){
@@ -100,7 +130,28 @@ void MyTractsKnot::ComputeGeometry(){
 	mVertices.resize(totalPoints);
 	mNormals.resize(totalPoints);
 	mTexCoords.resize(totalPoints);
+	mRadius.resize(totalPoints);
 	mColors.resize(totalPoints);
+
+	float minValue = mTracts->GetMinValue();
+	float maxValue = mTracts->GetMaxValue();
+
+	// localized range
+	MyVec3f center = mTracts->GetBoundingBox().GetCenter();
+	std::swap(minValue, maxValue);
+	for (int i = 0; i < mChildren.size(); i++){
+		MyBoxKnot* boxKnot = dynamic_cast<MyBoxKnot*>(mChildren[i]);
+		MyBoundingBox box = boxKnot->GetBox();
+		box.Translate(center);
+		float tmin = mTracts->GetMinValue(box);
+		float tmax = mTracts->GetMaxValue(box);
+		minValue = std::min(minValue, tmin);
+		maxValue = std::max(maxValue, tmax);
+	}
+	if (minValue < maxValue){
+		std::swap(minValue, maxValue);
+	}
+	float rangeValue = maxValue - minValue;
 
 	for(int it = 0;it < mTracts->GetNumTracts(); it++){
 		int npoints = mTracts->GetNumVertices(it);
@@ -127,11 +178,12 @@ void MyTractsKnot::ComputeGeometry(){
 				maxIdx = i;
 			}
 		}
-		pole = candicates[maxIdx];
+		pole = candicates[maxIdx].normalized();
 	
 		for(int i = 0;i<npoints;i++){
 			MyVec3f p = mTracts->GetCoord(it,i);
-			float size = mRadius;
+			//float size = (mTracts->GetValue(it, i) - minValue) / rangeValue*0.4;
+			float size = 0;
 			MyVec3f d;
 			if(i==npoints-1){
 				d = p-mTracts->GetCoord(it,i-1);
@@ -143,18 +195,21 @@ void MyTractsKnot::ComputeGeometry(){
 				d = mTracts->GetCoord(it,i+1)-mTracts->GetCoord(it,i-1);
 			}
 		
-			MyVec3f perpend = (pole^d).normalized();
+			MyVec3f perpend1 = (pole^d).normalized();
+			MyVec3f perpend2 = (perpend1^d).normalized();
 			for(int is = 0;is<mFaces;is++){
 				float angle = dangle*is;
-				MyVec3f pt = sin(angle)*pole+cos(angle)*perpend;
+				MyVec3f pt = sin(angle)*perpend1 + cos(angle)*perpend2;
 				mVertices[currentIdx+i*(mFaces+1)+is] = pt*size + p;
 				mNormals[currentIdx+i*(mFaces+1)+is] = pt;
-				mTexCoords[currentIdx+i*(mFaces+1)+is] = MyVec2f(i, is/(float)mFaces);
+				mTexCoords[currentIdx + i*(mFaces + 1) + is] = MyVec2f(i, is / (float)mFaces);
+				mRadius[currentIdx + i*(mFaces + 1) + is] =  (mTracts->GetValue(it, i) - minValue) / rangeValue*0.4;
 				mColors[currentIdx+i*(mFaces+1)+is] = mTracts->GetColor(it,i);
 			}
 			mVertices[currentIdx+i*(mFaces+1)+mFaces] = mVertices[currentIdx+i*(mFaces+1)];
 			mNormals[currentIdx+i*(mFaces+1)+mFaces] = mNormals[currentIdx+i*(mFaces+1)];
-			mTexCoords[currentIdx+i*(mFaces+1)+mFaces] = MyVec2f(i, 1);
+			mTexCoords[currentIdx + i*(mFaces + 1) + mFaces] = MyVec2f(i, 1);
+			mRadius[currentIdx + i*(mFaces + 1) + mFaces] = mRadius[currentIdx + i*(mFaces + 1)];
 			mColors[currentIdx+i*(mFaces+1)+mFaces] = mTracts->GetColor(it,i);
 		}
 
@@ -198,7 +253,13 @@ void MyTractsKnot::LoadBuffer(){
 	glBindBuffer(GL_ARRAY_BUFFER, mTexCoordBuffer);
 	glBufferData(GL_ARRAY_BUFFER, mTexCoords.size() * sizeof(MyVec2f), &mTexCoords[0][0], GL_STATIC_DRAW);
     glEnableVertexAttribArray(mTexCoordAttribute);
-    glVertexAttribPointer(mTexCoordAttribute , 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(mTexCoordAttribute, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	// radius
+	glGenBuffers(1, &mRadiusBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mRadiusBuffer);
+	glBufferData(GL_ARRAY_BUFFER, mRadius.size() * sizeof(float), &mRadius[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(mRadiusAttribute);
+	glVertexAttribPointer(mRadiusAttribute, 1, GL_FLOAT, GL_FALSE, 0, 0);
 	// color
 	glGenBuffers(1, &mColorBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, mColorBuffer);
@@ -237,6 +298,10 @@ void MyTractsKnot::LoadShader(){
 	if (mTexCoordAttribute < 0) {
 		cerr << "Shader did not contain the 'texCoord' attribute." << endl;
 	}
+	mRadiusAttribute = glGetAttribLocation(mShaderProgram, "radius");
+	if (mRadiusAttribute < 0) {
+		cerr << "Shader did not contain the 'radius' attribute." << endl;
+	}
 	mColorAttribute = glGetAttribLocation(mShaderProgram, "color");
 	if (mColorAttribute < 0) {
 		cerr << "Shader did not contain the 'color' attribute." << endl;
@@ -246,10 +311,10 @@ void MyTractsKnot::LoadShader(){
 int MyTractsKnot::mousePressEventHandler(MyGenericEvent& eve){
 	if (MyGenericEvent::MOUSE_WHEEL == eve.GetEventMouseKey()){
 		if (eve.GetEventKeyState() == MyGenericEvent::KEY_UP){
-			mTrackBall.ScaleAdd(0.05);
+			mTrackBall.ScaleMultiply(1.05);
 		}
 		else if (eve.GetEventKeyState() == MyGenericEvent::KEY_DOWN){
-			mTrackBall.ScaleAdd(-0.05);
+			mTrackBall.ScaleMultiply(1 / 1.05);
 		}
 		eve.Handled();
 	}
@@ -265,10 +330,10 @@ int MyTractsKnot::mousePressEventHandler(MyGenericEvent& eve){
 int MyTractsKnot::mouseReleaseEventHandler(MyGenericEvent& eve){
 	if (MyGenericEvent::MOUSE_WHEEL == eve.GetEventMouseKey()){
 		if (eve.GetEventKeyState() == MyGenericEvent::KEY_UP){
-			mTrackBall.ScaleAdd(0.05);
+			mTrackBall.ScaleMultiply(1.05);
 		}
 		else if (eve.GetEventKeyState() == MyGenericEvent::KEY_DOWN){
-			mTrackBall.ScaleAdd(-0.05);
+			mTrackBall.ScaleMultiply(1 / 1.05);
 		}
 		eve.Handled();
 	}

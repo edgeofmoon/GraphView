@@ -24,6 +24,27 @@ MyDataLoader::~MyDataLoader(void)
 {
 }
 
+MyBoundingBox MyDataLoader::LoadBoundingBoxFromFile(std::string fileName){
+	MyBoundingBox box;
+	ifstream inFile(fileName);
+	if (inFile.is_open()){
+		MyVec3f lowerEnd, higherEnd;
+		// ignore the first line
+		inFile.ignore(100, '\n');
+		inFile >> lowerEnd[0] >> lowerEnd[1] >> lowerEnd[2];
+
+		//inFile.ignore(100, '\n');
+		inFile >> higherEnd[0] >> higherEnd[1] >> higherEnd[2];
+
+		box = MyBoundingBox(lowerEnd, higherEnd);
+	}
+	else{
+		PrintCantOpenFileMsg(fileName);
+	}
+	inFile.close();
+	return box;
+}
+
 MyArray3f* MyDataLoader::MakeArrayVecFromFile(std::string fileName, int n){
 	MyArray3f* vecs = 0;
 	ifstream inFile(fileName);

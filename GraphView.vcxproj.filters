@@ -303,6 +303,9 @@
     <ClCompile Include="winAPItest.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="MyBoxKnot.cpp">
+      <Filter>Source Files\presentations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyMatrix.h">
@@ -606,6 +609,9 @@
       <Filter>Header Files\Presentations</Filter>
     </ClInclude>
     <ClInclude Include="MyBitmap.h">
+      <Filter>Header Files\Presentations</Filter>
+    </ClInclude>
+    <ClInclude Include="MyBoxKnot.h">
       <Filter>Header Files\Presentations</Filter>
     </ClInclude>
   </ItemGroup>

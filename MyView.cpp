@@ -174,7 +174,7 @@ int MyView::windowResizeEventHandler(MyGenericEvent& eve){
 	//mProjectionMatrix = MyMatrixf::PerspectiveMatrix(60,mWidth/(float)mHeight,1,1000);
 	
 	mProjectionMatrix = MyMatrixf::OrthographicMatrix(
-		-mWidth/2,mWidth/2,-mHeight/2,mHeight/2,1.f,10000.f);
+		-mWidth / 2, mWidth / 2, -mHeight / 2, mHeight / 2, 1.f, 1000.f);
 	mTrackBall.Reshape(mWidth,mHeight);
 	int sceneHandleResult = mScene->EventHandler(eve);
 	return sceneHandleResult;

@@ -33,7 +33,6 @@ protected:
 
 	const MyTracts* mTracts;
 	int mFaces;
-	float mRadius;
 
 	int mDisplayList;
 	MyArrayi mIdxOffset;
@@ -41,6 +40,7 @@ protected:
 	MyArray3f mVertices;
 	MyArray3f mNormals;
 	MyArray2f mTexCoords;
+	MyArrayf mRadius;
 	MyArray<MyColor4f> mColors;
 	MyArray3i mIndices;
 
@@ -50,6 +50,7 @@ protected:
 	unsigned int mVertexBuffer;
 	unsigned int mNormalBuffer;
 	unsigned int mTexCoordBuffer;
+	unsigned int mRadiusBuffer;
 	unsigned int mColorBuffer;
 	unsigned int mIndexBuffer;
 
@@ -57,6 +58,7 @@ protected:
 	int mNormalAttribute;
 	int mPositionAttribute;
 	int mTexCoordAttribute;
+	int mRadiusAttribute;
 	int mColorAttribute;
 };
 

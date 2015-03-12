@@ -10,6 +10,7 @@
 #include "MyDenseGraph.h"
 #include "MyString.h"
 #include "MyTracts.h"
+#include "MyBoundingBox.h"
 
 #include <string>
 #include <map>
@@ -37,6 +38,8 @@ class MyDataLoader
 public:
 	MyDataLoader(void);
 	~MyDataLoader(void);
+
+	static MyBoundingBox LoadBoundingBoxFromFile(std::string filename);
 
 	static MyArray3f* MakeArrayVecFromFile(std::string fileName, int n = -1);
 	static MyMatrixf* MakeMatrixFromFile(std::string fileName, int m = -1, int n = -1);

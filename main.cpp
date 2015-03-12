@@ -7,6 +7,7 @@
 #include "MyGraphicsTool.h"
 #include "MyGraphKnot.h"
 #include "MyView.h"
+#include "MyAntiAliasingView.h"
 #include "MyMapView.h"
 #include "MyWindow.h"
 #include "MyRenderScene.h"
@@ -29,6 +30,7 @@
 #include "MyTractsKnot.h"
 #include "MyBitmap.h"
 #include "MyImageKnot.h"
+#include "MyBoxKnot.h"
 
 #include "MyGraphEncodingRepresentation.h"
 #include "MyGraphAlgorithm.h"
@@ -132,88 +134,35 @@ int main(int argc, char* argv[]){
 	
 	helper.Init(&argc,argv);
 	scene = new MyRenderScene;
-	view = new MyView;
+	view = new MyAntiAliasingView;
 	window = new MyWindow;
 
-	/*
-	MyString dropBoxFolder = "C:\\Users\\GuohaoZhang\\Dropbox\\Programs\\NBS1.2\\SchizophreniaExample";
-	//string dropBoxFolder = "C:\\Users\\Guohao Zhang\\Desktop\\dropbox";
-	
-	MyGenericNode* hierarchy
-		= MyDataLoader::LoadHierarchyOverlay(dropBoxFolder + "\\nodeHierarchy.txt");
-	MyArray3f* pos
-		= MyDataLoader::MakeArrayVecFromFile(dropBoxFolder + "\\COG2.txt", 74);
-	MyArrayStr* labels
-		= MyDataLoader::MakeArrayStrFromFile(dropBoxFolder + "\\nodeLabels.txt");
-
-	MyDenseGraphf* graph = new MyDenseGraphf;
-
-	MyMatrixf* mat
-		= MyDataLoader::MakeMatrixFromFile(dropBoxFolder+"\\matrices\\MeanSubject.txt", 74, 74);
-	graph->SetMatrix(mat);
-	MyGraphFilter* graphFilter = new MyGraphFilter;
-	graphFilter->SetInputGraph(graph);
-	MyDenseGraphf* newGraph = dynamic_cast<MyDenseGraphf*>(graphFilter->MakeFilteringByEdgeWeightRatio(.15));
-	//SafeFreeObject(graph);
-
-	// node link diagram
-	MyGraphKnot* graphKnot = new MyGraphKnot;
-
-	// load data level info
-	graphKnot->SetGraph(newGraph);
-	graphKnot->SetGraphNodePos(pos);
-	graphKnot->SetGraphNodeLabel(labels);
-	graphKnot->SetHierarchy(hierarchy);
-	MyGraphLayout* layout = new MyGraphLayout;
-	layout->SetEdgeBundler(new MyGraphGeometryEdgeBundler);
-	layout->SetEdgeBundle();
-	MyGraphEncodingRepresentation* representation = new MyGraphEncodingRepresentation;
-	//MyGraphMatrixLayout* layout = new MyGraphMatrixLayout;
-	//layout->OrderByHierarchy(hierarchy);
-	//MyGraphEncodingRepresentation* representation = new MyGraphMatrixEncodingRepresentation;
-	//MyGraphLayout* layout = new MyGraphRadialLayout;
-	//MyGraphClusterEdgeBundler * bundler = new MyGraphClusterEdgeBundler;
-	//bundler->SetHierarchy(hierarchy);
-	//layout->SetEdgeBundler(bundler);
-	//layout->SetEdgeBundle();
-	//MyGraphEncodingRepresentation* representation = new MyGraphEncodingRepresentation;
-	MyGraphAlgorithm algor;
-	algor.SetGraph(newGraph);
-	algor.FloydWarshallWithPathReconstruction();
-	MyArrayf values = algor.GetBetweennessCentrality();
-	if (representation){
-		representation->SetNodeValuef(values);
-		representation->SetNodeEncodingMethods((MyVis::MyVisualElement)1);
-	}
-		
-	//MyGraphSelectionMask* mask = new MyGraphSelectionMask;
-	//mask->SetGraphRepresentation(representation);
-	//mask->SetHierarchy(hierarchy);
-
-	//graphKnot->SetSelectionMask(mask);
-	graphKnot->SetLayout(layout);
-	graphKnot->SetRepresentation(representation);
-
-	// systhesis info
-	graphKnot->SetName("MeanSubject");
-	graphKnot->Build();
-	scene->AddKnot(graphKnot);
-	*/
-
-	MyTracts* tracts = MyDataLoader::MakeTractsFromFile("C:\\Users\\GuohaoZhang\\Dropbox\\data\\normal_s5_boy.data");
+	MyTracts* tracts = MyDataLoader::MakeTractsFromFile("C:\\Users\\GuohaoZhang\\Dropbox\\data\\normal_s4_del0.data");
 	MyTractsKnot *tractKnot = new MyTractsKnot;
 	tractKnot->SetTracts(tracts);
+
+	/*
+	MyBoundingBox box1, box2;
+	box1 = MyDataLoader::LoadBoundingBoxFromFile("C:\\Users\\GuohaoZhang\\Dropbox\\task_data\\data\\normal_allfb\\region_for_task1\\s3\\cc\\pos1\\tumorbox_0_region_s3.data");
+	box2 = MyDataLoader::LoadBoundingBoxFromFile("C:\\Users\\GuohaoZhang\\Dropbox\\task_data\\data\\normal_allfb\\region_for_task1\\s3\\cc\\pos1\\tumorbox_1_region_s3.data");
+
+	MyBoxKnot *boxknot1 = new MyBoxKnot;
+	boxknot1->SetBox(box1);
+	boxknot1->Build();
+	//scene->AddKnot(boxknot1);
+
+	MyBoxKnot *boxknot2 = new MyBoxKnot;
+	boxknot2->SetBox(box2);
+	boxknot2->Build();
+	//scene->AddKnot(boxknot2);
+
+	MyKnot::Connect(tractKnot, boxknot1);
+	MyKnot::Connect(tractKnot, boxknot2);
+	*/
+
 	tractKnot->Build();
 	tractKnot->SetName("normal_s5_boy");
 	scene->AddKnot(tractKnot);
-
-	//MyImage* image = new MyBitmap;
-	//image->Open("test.bmp");
-	//MyImageKnot* imageKnot = new MyImageKnot;
-	//imageKnot->SetImage(image);
-	//imageKnot->SetName("test");
-	//imageKnot->Build();
-	//scene->AddKnot(imageKnot);
 
 	view->SetScene(scene);
 	scene->SetView(view);

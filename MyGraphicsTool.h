@@ -69,6 +69,11 @@ public:
 	static void Color(const MyColor4f& color);
 	static void EndPrimitive();
 
+	// face culling
+	static void DisableFaceCulling();
+	static void EnableFaceCulling();
+	static void FaceCullingMode(int modeByte);
+
 	static void EnableAlplaBlending();
 	static void DisableAlplaBlending();
 	static void SetReverseColorAlphaBlending();
