@@ -140,6 +140,7 @@ MyTracts* MyDataLoader::MakeTractsFromFile(const MyString& fileName){
 	if(inFile.is_open()){
 		int numTracts;
 		inFile >> numTracts;
+		//numTracts = 10;;
 		MyTracts* ptracts = new MyTracts;
 		MyTracts& tracts = *ptracts;
 		for(int i = 0;i<numTracts;i++){

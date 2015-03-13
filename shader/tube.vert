@@ -24,9 +24,8 @@ out float isInBox;
 
 void main (void)
 {
-	//float r = radius;
-	float r = 0.4;
-	/*
+	float r = max(0.02, radius);
+	
 	if(position.x > boxLow1.x && position.x < boxHigh1.x
 		&& position.y > boxLow1.y && position.y < boxHigh1.y
 		&& position.z > boxLow1.z && position.z < boxHigh1.z ){
@@ -43,14 +42,24 @@ void main (void)
 			r = 0.0;
 		}
 	}
+	/*
+	vec4 p1=vec4(position, 1);
+	vec4 p2=vec4(position+normal, 1);
+
+	vec4 p3=projMat*mvMat*p1;
+	vec4 p4=projMat*mvMat*p2;
+
+	float size=length(vec3(p4-p3));
+
+	r=r/size*30;
 	*/
-	
 	vec3 tposition = position+normal*r;
+	gl_Position = projMat*mvMat*vec4(tposition,1);
+
 	fposition = vec3(mvMat*vec4(tposition,1));
 
 	colourV = color;
-	fnormal = normalize(vec3(transpose(inverse(mvMat))*vec4(normal,0)));
+	vec4 tnormal = transpose(inverse(mvMat))*vec4(normal,0);
+	fnormal = normalize(vec3(tnormal.x, tnormal.y, tnormal.z));
 	ftexCoord = texCoord;
-
-    gl_Position = projMat*mvMat*vec4(tposition,1);
 }

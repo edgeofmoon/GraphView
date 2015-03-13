@@ -1,7 +1,7 @@
 #pragma once
-#include "mymultiview.h"
+#include "myview.h"
 class MyAntiAliasingView :
-	public MyMultiView
+	public MyView
 {
 public:
 	MyAntiAliasingView(void);

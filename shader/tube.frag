@@ -18,9 +18,8 @@ float LinearizeDepth(float z, float n, float f)
 
 void main(void)
 {
-
 	vec3 normal = normalize(fnormal);
-	vec3 lightDir = vec3(0,0,-1);
+	vec3 lightDir = vec3(0,0,1);
 	float ambient = 0.3;
 	//float diffusion = 0.6*clamp(dot(normal,lightDir),0,1);
 	float diffusion = 0.6*abs(dot(normal,lightDir));
@@ -28,8 +27,9 @@ void main(void)
 	vec3 hv = normalize(eyeDir+lightDir);
 	//float specular = 0.5*pow(clamp(dot(hv,normal),0,1),16);
 	float specular = 0.5*pow(abs(dot(hv,normal)),16);
-	//fragColour = colourV;//texture(texUnit, texCoord);
-    fragColour = colourV*(ambient+diffusion);
+	fragColour = colourV;//texture(texUnit, texCoord);
+	fragColour = colourV*(ambient+diffusion);
 	fragColour += vec4(specular,specular,specular,0);
 	fragColour.a = 1;
+	if(isInBox<1) fragColour.a = 0;
 }

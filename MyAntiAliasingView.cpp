@@ -48,7 +48,7 @@ void MyAntiAliasingView::Show(){
 	MyVec4i viewport = MyPrimitiveDrawer::GetViewport();
 	MyPrimitiveDrawer::SetViewport(MyVec4i(0,0, mWidth*DETAIL_X, mHeight*DETAIL_Y));
 	//MyPrimitiveDrawer::SetToByPixelMatrix(mWidth, mHeight, 0, 1000);
-	MyMultiView::Show();
+	MyView::Show();
 	MyPrimitiveDrawer::SetViewport(viewport);
 	//MyPrimitiveDrawer::PopMatrix();
 	//MyPrimitiveDrawer::PopProjectionMatrix();

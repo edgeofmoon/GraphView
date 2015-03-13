@@ -134,14 +134,14 @@ int main(int argc, char* argv[]){
 	
 	helper.Init(&argc,argv);
 	scene = new MyRenderScene;
-	view = new MyAntiAliasingView;
+	//view = new MyAntiAliasingView;
+	view = new MyView;
 	window = new MyWindow;
 
 	MyTracts* tracts = MyDataLoader::MakeTractsFromFile("C:\\Users\\GuohaoZhang\\Dropbox\\data\\normal_s4_del0.data");
 	MyTractsKnot *tractKnot = new MyTractsKnot;
 	tractKnot->SetTracts(tracts);
 
-	/*
 	MyBoundingBox box1, box2;
 	box1 = MyDataLoader::LoadBoundingBoxFromFile("C:\\Users\\GuohaoZhang\\Dropbox\\task_data\\data\\normal_allfb\\region_for_task1\\s3\\cc\\pos1\\tumorbox_0_region_s3.data");
 	box2 = MyDataLoader::LoadBoundingBoxFromFile("C:\\Users\\GuohaoZhang\\Dropbox\\task_data\\data\\normal_allfb\\region_for_task1\\s3\\cc\\pos1\\tumorbox_1_region_s3.data");
@@ -158,7 +158,6 @@ int main(int argc, char* argv[]){
 
 	MyKnot::Connect(tractKnot, boxknot1);
 	MyKnot::Connect(tractKnot, boxknot2);
-	*/
 
 	tractKnot->Build();
 	tractKnot->SetName("normal_s5_boy");

@@ -12,7 +12,7 @@ using namespace std;
 
 MyTractsKnot::MyTractsKnot(void)
 {
-	mFaces = 6;
+	mFaces = 8;
 	mDrawBoundingBox = false;
 }
 
@@ -26,7 +26,6 @@ void MyTractsKnot::Show(){
 	MyGraphicsTool::LoadTrackBall(&mTrackBall);
 	//MyGraphicsTool::Sphere(10);
 
-	/*
 	MyBoundingBox box[2];
 	for (int i = 0; i < mChildren.size(); i++){
 		MyBoxKnot* knot = dynamic_cast<MyBoxKnot*>(mChildren[i]);
@@ -35,13 +34,14 @@ void MyTractsKnot::Show(){
 			box[i] = knot->GetBox();
 		}
 	}
-	*/
 
 	MyGraphicsTool::Translate(-mTracts->GetBoundingBox().GetCenter());
 
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(mVertexArray);
 	glUseProgram(mShaderProgram);
 
@@ -55,7 +55,6 @@ void MyTractsKnot::Show(){
 	glGetFloatv(GL_PROJECTION_MATRIX, projMat);
 	glUniformMatrix4fv(projmatLocation, 1, GL_FALSE, projMat);
 
-	/*
 	int boxLowLocation1 = glGetUniformLocation(mShaderProgram, "boxLow1");
 	int boxHighLocation1 = glGetUniformLocation(mShaderProgram, "boxHigh1");
 	MyVec3f lowPos1 = box[0].GetLowPos()+mTracts->GetBoundingBox().GetCenter();
@@ -69,12 +68,14 @@ void MyTractsKnot::Show(){
 	MyVec3f highPos2 = box[1].GetHighPos() + mTracts->GetBoundingBox().GetCenter();
 	glUniform3f(boxLowLocation2, lowPos2[0], lowPos2[1], lowPos2[2]);
 	glUniform3f(boxHighLocation2, highPos2[0], highPos2[1], highPos2[2]);
-*/
 
-	glDrawElements(GL_TRIANGLES, mIndices.size()*3, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, mIndices.size() * 3, GL_UNSIGNED_INT, 0);
+
+	glDisable(GL_BLEND);
+	glDrawElements(GL_LINES, mIndices.size() * 3, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
 	glBindVertexArray(0);
-	glDisable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
 	MyGraphicsTool::PopMatrix();
 }
 void MyTractsKnot::Destory(){
@@ -182,8 +183,8 @@ void MyTractsKnot::ComputeGeometry(){
 	
 		for(int i = 0;i<npoints;i++){
 			MyVec3f p = mTracts->GetCoord(it,i);
-			//float size = (mTracts->GetValue(it, i) - minValue) / rangeValue*0.4;
-			float size = 0;
+			float size = (mTracts->GetValue(it, i) - minValue) / rangeValue*0.4;
+			//float size = 0;
 			MyVec3f d;
 			if(i==npoints-1){
 				d = p-mTracts->GetCoord(it,i-1);
@@ -197,13 +198,14 @@ void MyTractsKnot::ComputeGeometry(){
 		
 			MyVec3f perpend1 = (pole^d).normalized();
 			MyVec3f perpend2 = (perpend1^d).normalized();
+			//if ((perpend1^perpend2)*d < 0) dangle = -dangle;
 			for(int is = 0;is<mFaces;is++){
 				float angle = dangle*is;
 				MyVec3f pt = sin(angle)*perpend1 + cos(angle)*perpend2;
-				mVertices[currentIdx+i*(mFaces+1)+is] = pt*size + p;
+				mVertices[currentIdx+i*(mFaces+1)+is] = pt*0 + p;
 				mNormals[currentIdx+i*(mFaces+1)+is] = pt;
 				mTexCoords[currentIdx + i*(mFaces + 1) + is] = MyVec2f(i, is / (float)mFaces);
-				mRadius[currentIdx + i*(mFaces + 1) + is] =  (mTracts->GetValue(it, i) - minValue) / rangeValue*0.4;
+				mRadius[currentIdx + i*(mFaces + 1) + is] =  size;
 				mColors[currentIdx+i*(mFaces+1)+is] = mTracts->GetColor(it,i);
 			}
 			mVertices[currentIdx+i*(mFaces+1)+mFaces] = mVertices[currentIdx+i*(mFaces+1)];
