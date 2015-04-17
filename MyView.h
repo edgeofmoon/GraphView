@@ -33,6 +33,12 @@ public:
 
 	virtual MyTrackBall& GetTrackBall();
 
+	virtual void SetProjectionMatrix(const MyMatrixf& mat) { mProjectionMatrix = mat; };
+	virtual void SetModelViewMatrix(const MyMatrixf& mat) { mModelViewMatrix = mat; };
+
+	virtual MyMatrixf GetProjectionMatrix() const{ return mProjectionMatrix; };
+	virtual MyMatrixf GetModelViewMatrix() const{ return mModelViewMatrix; };
+
 protected:
 	
 	virtual int keyPressEventHandler(MyGenericEvent& eve);

@@ -61,6 +61,12 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{1fae9792-e4e3-44e3-afe1-e26f6b1c68d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\task">
+      <UniqueIdentifier>{ae4ecac2-d5d3-4009-90b2-501acd513db3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\task">
+      <UniqueIdentifier>{8d4ab52b-f8c4-4503-b512-c70c7a32f132}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="out\svd.c">
@@ -305,6 +311,15 @@
     </ClCompile>
     <ClCompile Include="MyBoxKnot.cpp">
       <Filter>Source Files\presentations</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTractTaskInstance.cpp">
+      <Filter>Source Files\task</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTractTaskInterface.cpp">
+      <Filter>Source Files\task</Filter>
+    </ClCompile>
+    <ClCompile Include="MyGlobalVariables.cpp">
+      <Filter>Source Files\task</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -613,6 +628,15 @@
     </ClInclude>
     <ClInclude Include="MyBoxKnot.h">
       <Filter>Header Files\Presentations</Filter>
+    </ClInclude>
+    <ClInclude Include="MyTractTaskInstance.h">
+      <Filter>Header Files\task</Filter>
+    </ClInclude>
+    <ClInclude Include="MyTractTaskInterface.h">
+      <Filter>Header Files\task</Filter>
+    </ClInclude>
+    <ClInclude Include="MyGlobalVariables.h">
+      <Filter>Header Files\task</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

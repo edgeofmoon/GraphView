@@ -10,6 +10,8 @@ public:
 	MyBox(const MyVec<T,n>& low, const MyVec<T,n>& high);
 	~MyBox(void);
 
+	bool IsIn(const MyVec<T, n>& p)const;
+
 	void Set(const MyVec<T,n>& low, const MyVec<T,n>& high);
 	void SetLow(const MyVec<T,n>& low);
 	void SetHigh(const MyVec<T,n>& high);
@@ -54,6 +56,15 @@ MyBox<T,n>::MyBox(const MyVec<T,n>& low, const MyVec<T,n>& high){
 
 template<typename T, int n>
 MyBox<T,n>::~MyBox(void){
+}
+
+template<typename T, int n>
+bool MyBox<T, n>::IsIn(const MyVec<T, n>& p) const{
+	for (int i = 0; i < n; i++){
+		if (p[i] < mLow[i]) return false;
+		if (p[i] > mHigh[i]) return false;
+	}
+	return true;
 }
 
 template<typename T, int n>

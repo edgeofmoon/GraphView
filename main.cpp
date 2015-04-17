@@ -1,44 +1,17 @@
-
 #include "MyString.h"
-
 #include "MyArray.h"
-#include "MyKnotLayoutManager.h"
 #include "MyDataLoader.h"
 #include "MyGraphicsTool.h"
 #include "MyGraphKnot.h"
 #include "MyView.h"
 #include "MyAntiAliasingView.h"
-#include "MyMapView.h"
 #include "MyWindow.h"
 #include "MyRenderScene.h"
-#include "MyGenericEvent.h"
-#include "MyGraphFilter.h"
-#include "MyDenseGraph.h"
 #include "MyUtility.h"
 
-#include "MyGraphLayout.h"
-#include "MyGraphMatrixLayout.h"
-#include "MyGraphMatrixRepresentation.h"
-#include "MyGraphIterativeLayout.h"
-#include "MyGraphFruchtermanReingoldLayout.h"
-#include "MyGraphLocalOptimizationLayout.h"
-#include "MyGraphHierarchicalLayout.h"
-#include "MyGraphLodLayout.h"
-#include "MyGraphRadialLayout.h"
-#include "MyGenericLayoutSyncer.h"
-
 #include "MyTractsKnot.h"
-#include "MyBitmap.h"
-#include "MyImageKnot.h"
 #include "MyBoxKnot.h"
-
-#include "MyGraphEncodingRepresentation.h"
-#include "MyGraphAlgorithm.h"
-#include "MyGraphMatrixEncodingRepresentation.h"
-
-#include "MyGraphEdgeBundler.h"
-#include "MyGraphClusterEdgeBundler.h"
-#include "MyGraphGeometryEdgeBundler.h"
+#include "MyTractTaskInterface.h"
 
 #include <GL/freeglut.h>
 #include <iostream>
@@ -50,6 +23,8 @@ MyGraphicsTool helper;
 MyView* view;
 MyScene* scene;
 MyWindow* window;
+
+MyTractTaskInterface ui;
 
 // suppose only one keyboard or mouse
 MyGenericEvent::MyMouseKey lastEventMouseKey = MyGenericEvent::MOUSE_KEY_LEFT;
@@ -72,6 +47,7 @@ MyModifierState modiferState(){
 void DisplayFunc(void){
 	helper.ClearFrameBuffer();
 	window->Show();
+	ui.Show();
 	helper.FreshScreen();
 }
 void ReshapeFunc(int w, int h){
@@ -99,6 +75,7 @@ void MouseKeyFunc(int button, int state, int x, int y){
 	lastEventMouseKey = toKey(button);
 	MyGenericEvent::MyKeyState keyState = toState(state);
 	MyGenericEvent eve = MyGenericEvent::GenerateMouseKeyEvent(lastEventMouseKey, keyState, x, y, modiferState());
+	ui.EventHandler(eve);
 	window->EventHandler(eve);
 	helper.Update();
 }
@@ -109,6 +86,7 @@ void MouseMoveFunc(int x, int y){
 	}
 	MyGenericEvent eve = MyGenericEvent::GenerateMouseMoveEvent(
 		lastEventMouseKey, MyGenericEvent::KEY_DOWN, x, y, modiferState());
+	ui.EventHandler(eve);
 	window->EventHandler(eve);
 	if (eve.DoNeedRedraw()){
 		helper.Update();
@@ -167,6 +145,9 @@ int main(int argc, char* argv[]){
 	scene->SetView(view);
 	scene->Build();
 	view->Build();
+
+	ui.SetEnable(true);
+	ui.Build();
 
 	window->AddView(view);
 
