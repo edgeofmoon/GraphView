@@ -14,10 +14,12 @@ public:
 	void Show();
 	void Build();
 
+
 	void SetEnable(bool b){ mEnabled = b; };
 	void SetIndex(int i){ mIdx = i; };
 	void SetTotalNumTrials(int total){ mTotal = total; };
 	void SetResultShown(bool b = true) { mShowResult = b; };
+	void SetStatusStrings(const MyArrayStr& str){ mStatusStrings = str; };
 	void SetWarningText(const MyString& str){ mWarningString = str; };
 	void SetUserSelection(int idx){ mUserSelection = idx; };
 	void SetEmpty(bool bemp){ mEmpty = bemp; };
@@ -37,6 +39,7 @@ protected:
 	int mTotal;
 	bool mShowResult;
 
+	MyArrayStr mStatusStrings;
 	MyString mWarningString;
 
 	virtual int mouseReleaseEventHandler(MyGenericEvent& eve);

@@ -75,8 +75,9 @@ void MyBoxKnot::Build(){
 
 	MyGraphicsTool::EnableFaceCulling();
 	// cull front face only
+	//MyGraphicsTool::EnableAlplaBlending();
 	MyGraphicsTool::FaceCullingMode(2);
-	MyGraphicsTool::Color(MyColor4f(0.8f, 0.8f, 0.8f, 1.f));
+	MyGraphicsTool::Color(MyColor4f(0.8f, 0.8f, 0.8f, 0.5f));
 	for (int iface = 0; iface<6; iface++){
 		MyVec4i vidx = faces[iface];
 		MyVec3f normal = normals[iface];
@@ -87,6 +88,7 @@ void MyBoxKnot::Build(){
 		}
 		MyGraphicsTool::EndPrimitive();
 	}
+	//MyGraphicsTool::DisableAlplaBlending();
 	MyGraphicsTool::DisableFaceCulling();
 
 	MyGraphicsTool::SetLineWidth(3);

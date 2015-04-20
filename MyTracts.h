@@ -21,10 +21,8 @@ public:
 	int GetNumVertices(int i) const;
 	int GetTotalNumVertices() const;
 	
-	float GetMinValue() const;
-	float GetMaxValue() const;
-	float GetMinValue(const MyBoundingBox& box) const;
-	float GetMaxValue(const MyBoundingBox& box) const;
+	MyArrayf GetValueStats() const;
+	MyArrayf GetValueStats(const MyBoundingBox& box) const;
 
 	MyBoundingBox GetBoundingBox() const;
 
@@ -32,6 +30,6 @@ protected:
 	MyArray<MyArray3f> mCoords;
 	MyArray<MyArray<MyColor4f>> mColors;
 	MyBoundingBox mBox;
-	float mValueMin, mValueMax;
+	float mValueMin, mValueMax, mTotalValue;
 };
 

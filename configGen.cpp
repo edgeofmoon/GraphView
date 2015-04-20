@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
 	MyString boxes[2] = { MyString("tumorbox_0_region_s2.data"), MyString("tumorbox_1_region_s2.data") };
 
 	// projection
-	MyString projections[NUMPROJ] = { MyString("PERSPECTIVE"), MyString("ORTHOGONAL"), MyString("SCREEBSPACE") };
+	MyString projections[NUMPROJ] = { MyString("PERSPECTIVE"), MyString("ORTHOGONAL"), MyString("SCREENSPACE") };
 
 	// scale
 	float betas[NUMBETA] = { -1, 0.4, 1, 1.4, 2, 3 };

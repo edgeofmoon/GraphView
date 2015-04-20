@@ -1,8 +1,10 @@
-#include "MyTractTaskInstance.h"
 
+#include "MyTractTaskInstance.h"
 #include "MyView.h"
+#include "MyAntiAliasingView.h"
 #include "MyScene.h"
 #include "MyTractsKnot.h"
+#include "MyTractLegendKnot.h"
 #include "MyBoxKnot.h"
 #include "MyTractTaskInterface.h"
 #include "MyGraphicsTool.h"
@@ -10,6 +12,7 @@
 #include "MyDataLoader.h"
 #include "MyGlobalVariables.h"
 
+#include <GL/freeglut.h>
 #include <fstream>
 #include <map>
 
@@ -47,14 +50,15 @@ MyProjectionEnum MyProjection::GetProjectionEnum(const MyString& projStr){
 	else return INVALID;
 }
 
+MyString MyTractTaskInstance::mDecimer = "\t";
+
 MyTractTaskInstance::MyTractTaskInstance(int pid, int tid, int total){
 	mParticipantIndex = pid;
 	mTrialIndex = tid;
 	mTotalTrials = total;
 
 
-
-	mIsEmpty = true;
+	mIsEmpty = false;
 }
 
 
@@ -98,34 +102,49 @@ void MyTractTaskInstance::Build(){
 	mTractKnot->SetBeta(mBeta);
 	mTractKnot->Build();
 
+	mLegendKnot = new MyTractLegendKnot;
+	mLegendKnot->SetBeta(mBeta);
+	mLegendKnot->SetValueRange(mTractKnot->GetValueRange());
+	mLegendKnot->Build();
+
 	MyVec4i viewport = MyGraphicsTool::GetViewport();
 	mTractKnot->GetTrackBall().Reshape(viewport[2], viewport[3]);
-
-	mInterface = new MyTractTaskInterface;
-	mInterface->SetEmpty(mIsEmpty);
-	mInterface->Build();
-
-	mView = new MyView;
-	mScene = new MyScene;
-	mScene->AddKnot(mTractKnot);
-	mView->SetScene(mScene);
-	mScene->SetView(mView);
-	mScene->Build();
-	mView->Build();
-	mView->Build();
-
-	updateViewProjection(1024, 768);
+	mLegendKnot->GetTrackBall().Reshape(viewport[2], viewport[3]);
 
 	mInterface = new MyTractTaskInterface;
 	mInterface->SetEnable(true);
+	mInterface->SetEmpty(mIsEmpty);
+	MyArrayStr statusStrs;
+	statusStrs << MyString(mTrialIndex) + "/" + MyString(mTotalTrials);
+	statusStrs << MyProjection::GetProjectionName(mProjectionMethod);
+	statusStrs << "Beta = " + MyString(mBeta);
+
+	mInterface->SetStatusStrings(statusStrs);
 	mInterface->Build();
+
+	//mView = new MyView;
+	mView = new MyAntiAliasingView;
+	mScene = new MyScene;
+	mScene->AddKnot(mTractKnot);
+	mScene->AddKnot(mLegendKnot);
+	mView->SetScene(mScene);
+	mView->SetViewport(viewport);
+	mScene->SetView(mView);
+	mScene->Build();
+	mView->Build();
+
+	updateViewProjection(viewport[2], viewport[3]);
 }
 
 void MyTractTaskInstance::Show(){
 	if (!mInterface->IsPaused()){
 		mView->Show();
 	}
+	glDisable(GL_DEPTH_TEST);
 	mInterface->Show();
+	glEnable(GL_DEPTH_TEST);
+
+	mTimer.StartTimerIfNotYet();
 }
 
 void MyTractTaskInstance::Destory(){
@@ -165,9 +184,39 @@ void MyTractTaskInstance::SetTotalTrialNumber(int tn){
 }
 
 void MyTractTaskInstance::LogHeader(std::ostream& out){
+	out << "pIdx" << mDecimer
+		<< "trialIdx" << mDecimer
+		<< "config" << mDecimer
+		<< "projection" << mDecimer
+		<< "beta" << mDecimer
+		<< "value1" << mDecimer
+		<< "value2" << mDecimer
+		<< "minValue" << mDecimer
+		<< "maxValue" << mDecimer
+		<< "userAnswer" << mDecimer
+		<< "timeUsed" << mDecimer
+		<< "isCorrect" << endl;
 }
 
 void MyTractTaskInstance::Log(std::ostream& out){
+	MyArrayf avgValues = mTractKnot->GetAvgValues();
+	MyVec2f rangeValue = mTractKnot->GetValueRange();
+	int isCorrect = 0;
+	if (avgValues[0] > avgValues[1] && mInterface->GetUserSelection() == 0){
+		isCorrect = 1;
+	}
+	out << mParticipantIndex << mDecimer
+		<< mTrialIndex << mDecimer
+		<< mConfigFileName << mDecimer
+		<< MyProjection::GetProjectionName(mProjectionMethod) << mDecimer
+		<< mBeta << mDecimer
+		<< avgValues[0] << mDecimer
+		<< avgValues[1] << mDecimer
+		<< rangeValue[0] << mDecimer
+		<< rangeValue[1] << mDecimer
+		<< mInterface->GetUserSelection()+1 << mDecimer
+		<< mTimer.GetUsedTime() << mDecimer
+		<< isCorrect << endl;
 }
 
 
@@ -189,6 +238,17 @@ int MyTractTaskInstance::EventHandler(MyGenericEvent& eve){
 		// empty task does not do anything
 		if (mIsEmpty) return UIHandleRst;
 		mUserAnswerIndex = mInterface->GetUserSelection();
+		mTimer.FreshEndTime();
+
+	}
+	else if (UIHandleRst == 3){
+		// pause
+		if (mInterface->IsPaused()){
+			mTimer.PauseTimer();
+		}
+		else{
+			mTimer.ResumeTimer();
+		}
 	}
 	return UIHandleRst;
 }
@@ -197,16 +257,27 @@ void MyTractTaskInstance::updateViewProjection(int width, int height){
 	float aspect = width / (float)height;
 	switch (mProjectionMethod)
 	{
-	case MyProjection::PERSPECTIVE:
 	case MyProjection::SCREENSPACE:
+		mTractKnot->SetScreenSpace(true);
+		mLegendKnot->SetScreenSpace(true);
+		mView->SetProjectionMatrix(MyMatrixf::PerspectiveMatrix(
+			PERSPECTIVE_FOV, aspect, VIEW_NEAR, VIEW_FAR));
+		break;
+	case MyProjection::PERSPECTIVE:
+		mTractKnot->SetScreenSpace(false);
+		mLegendKnot->SetScreenSpace(false);
 		mView->SetProjectionMatrix(MyMatrixf::PerspectiveMatrix(
 			PERSPECTIVE_FOV, aspect, VIEW_NEAR, VIEW_FAR));
 		break;
 	case MyProjection::INVALID:
 	case MyProjection::ORTHOGONAL:
 	default:
+		mTractKnot->SetScreenSpace(false);
+		mLegendKnot->SetScreenSpace(false);
+		//mView->SetProjectionMatrix(MyMatrixf::OrthographicMatrix(
+		//	VIEW_BOTTOM*aspect, VIEW_TOP*aspect, VIEW_BOTTOM, VIEW_TOP, VIEW_NEAR, VIEW_FAR));
 		mView->SetProjectionMatrix(MyMatrixf::OrthographicMatrix(
-			VIEW_BOTTOM*aspect, VIEW_TOP*aspect, VIEW_BOTTOM, VIEW_TOP, VIEW_NEAR, VIEW_FAR));
+			VIEW_BOTTOM * aspect, VIEW_TOP * aspect, VIEW_BOTTOM, VIEW_TOP, VIEW_NEAR, VIEW_FAR));
 		break;
 	}
 }

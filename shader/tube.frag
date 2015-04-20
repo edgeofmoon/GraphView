@@ -1,10 +1,7 @@
 #version 330
 
-uniform sampler2D texUnit;
-
 in vec4 colourV;
 in vec3 fnormal;
-in vec2 ftexCoord;
 in vec3 fposition;
 
 in float isInBox;

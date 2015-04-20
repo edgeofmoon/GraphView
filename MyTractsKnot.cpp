@@ -31,14 +31,14 @@ void MyTractsKnot::Show(){
 	for (int i = 0; i < mChildren.size(); i++){
 		MyBoxKnot* knot = dynamic_cast<MyBoxKnot*>(mChildren[i]);
 		if (knot){
-			knot->Show();
+			//knot->Show();
 			box[i] = knot->GetBox();
 		}
 	}
 
 	MyGraphicsTool::Translate(-mTracts->GetBoundingBox().GetCenter());
 
-
+	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK);
 	glEnable(GL_BLEND);
@@ -70,17 +70,52 @@ void MyTractsKnot::Show(){
 	glUniform3f(boxLowLocation2, lowPos2[0], lowPos2[1], lowPos2[2]);
 	glUniform3f(boxHighLocation2, highPos2[0], highPos2[1], highPos2[2]);
 
+	int screenSpaceLocation = glGetUniformLocation(mShaderProgram, "screenSpace");
+	int screenSpace = mbScreenSpace ? 1 : 0;
+	glUniform1i(screenSpaceLocation, screenSpace);
+
 	glDrawElements(GL_TRIANGLES, mIndices.size() * 3, GL_UNSIGNED_INT, 0);
 
 	glDisable(GL_BLEND);
 	glDrawElements(GL_LINES, mIndices.size() * 3, GL_UNSIGNED_INT, 0);
 	glUseProgram(0);
 	glBindVertexArray(0);
+
 	//glDisable(GL_CULL_FACE);
+	MyGraphicsTool::PopMatrix();
+
+	// draw later to ensure it will be shown
+	MyGraphicsTool::PushMatrix();
+	MyGraphicsTool::LoadTrackBall(&mTrackBall);
+	for (int i = 0; i < mChildren.size(); i++){
+		MyBoxKnot* knot = dynamic_cast<MyBoxKnot*>(mChildren[i]);
+		if (knot){
+			knot->Show();
+		}
+	}
+
+	glDisable(GL_DEPTH_TEST);
+	MyGraphicsTool::Color(MyColor4f(0, 0, 1, 1));
+	for (int i = 0; i < 2; i++){
+		//MyPrimitiveDrawer::DrawStrokeText(
+		//	box[i].GetLowPos() + mTracts->GetBoundingBox().GetCenter(), 
+		//	MyString(i + 1), MyVec3f(.3, .3, .3));
+		MyPrimitiveDrawer::DrawBitMapTextLarge(
+			box[i].GetLowPos(),MyString(i + 1), 0);
+	}
+	glEnable(GL_DEPTH_TEST);
 	MyGraphicsTool::PopMatrix();
 }
 void MyTractsKnot::Destory(){
 	SafeFreeObject(mTracts);
+	glDeleteProgram(mShaderProgram);
+	glDeleteVertexArrays(1, &mVertexArray);
+	glDeleteBuffers(1, &mVertexBuffer);
+	glDeleteBuffers(1, &mNormalBuffer);
+	glDeleteBuffers(1, &mTexCoordBuffer);
+	glDeleteBuffers(1, &mRadiusBuffer);
+	glDeleteBuffers(1, &mColorBuffer);
+	glDeleteBuffers(1, &mIndexBuffer);
 }
 bool MyTractsKnot::SeeAny(){
 	//int maxNumItems = mLayout->GetGraph()->GetNumNodes() + mLayout->GetGraph()->GetNumEdges();
@@ -149,24 +184,31 @@ void MyTractsKnot::ComputeGeometry(){
 	mRadius.resize(totalPoints);
 	mColors.resize(totalPoints);
 
-	float minValue = mTracts->GetMinValue();
-	float maxValue = mTracts->GetMaxValue();
+	MyArrayf valueStats = mTracts->GetValueStats();
+	float minValue = valueStats[0];
+	float maxValue = valueStats[2];
 
 	// localized range
 	MyVec3f center = mTracts->GetBoundingBox().GetCenter();
 	std::swap(minValue, maxValue);
+	mAvgValues.clear();
 	for (int i = 0; i < mChildren.size(); i++){
 		MyBoxKnot* boxKnot = dynamic_cast<MyBoxKnot*>(mChildren[i]);
 		MyBoundingBox box = boxKnot->GetBox();
 		box.Translate(center);
-		float tmin = mTracts->GetMinValue(box);
-		float tmax = mTracts->GetMaxValue(box);
+		MyArrayf tvalueStats = mTracts->GetValueStats(box);
+		float tmin = tvalueStats[0];
+		mAvgValues << tvalueStats[1];
+		float tmax = tvalueStats[2];
 		minValue = std::min(minValue, tmin);
 		maxValue = std::max(maxValue, tmax);
 	}
 	if (minValue > maxValue){
 		std::swap(minValue, maxValue);
 	}
+	mMinValue = minValue;
+	mMaxValue = maxValue;
+
 	float rangeValue = maxValue - minValue;
 
 	for(int it = 0;it < mTracts->GetNumTracts(); it++){
@@ -222,13 +264,15 @@ void MyTractsKnot::ComputeGeometry(){
 				mNormals[currentIdx+i*(mFaces+1)+is] = pt;
 				mTexCoords[currentIdx + i*(mFaces + 1) + is] = MyVec2f(i, is / (float)mFaces);
 				mRadius[currentIdx + i*(mFaces + 1) + is] =  size;
-				mColors[currentIdx+i*(mFaces+1)+is] = mTracts->GetColor(it,i);
+				//mColors[currentIdx + i*(mFaces + 1) + is] = mTracts->GetColor(it, i);
+				mColors[currentIdx + i*(mFaces + 1) + is] = MyColor4f(0.5,0.5,0.5,1);
 			}
 			mVertices[currentIdx+i*(mFaces+1)+mFaces] = mVertices[currentIdx+i*(mFaces+1)];
 			mNormals[currentIdx+i*(mFaces+1)+mFaces] = mNormals[currentIdx+i*(mFaces+1)];
 			mTexCoords[currentIdx + i*(mFaces + 1) + mFaces] = MyVec2f(i, 1);
 			mRadius[currentIdx + i*(mFaces + 1) + mFaces] = mRadius[currentIdx + i*(mFaces + 1)];
-			mColors[currentIdx+i*(mFaces+1)+mFaces] = mTracts->GetColor(it,i);
+			//mColors[currentIdx + i*(mFaces + 1) + mFaces] = mTracts->GetColor(it, i);
+			mColors[currentIdx + i*(mFaces + 1) + mFaces] = MyColor4f(0.5, 0.5, 0.5, 1);
 		}
 
 		mIdxOffset << currentIdx;

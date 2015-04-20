@@ -21,6 +21,11 @@
 // index
 #define UI_BOX_ANSWER_INDEX_OFFSET 0
 
+#define UI_STRING_LEFT -1
+#define UI_STRING_STATUS_UPPER_BOTTOM 0.9
+#define UI_STRING_STATUS_INTERVAL 0.025
+
+
 // 0: next 1: pause
 #define UI_BOX_UTIL_INDEX_OFFSET 9000
 #define UI_BOX_FINISH_INDEX 0
@@ -76,6 +81,11 @@ void MyTractTaskInterface::Show(){
 
 	for (int i = 0; i < mUtilBoxes.size(); i++){
 		drawBox(mUtilBoxes[i], mUtilBoxStrings[i], mUtilBoxStatus[i]);
+	}
+
+	for (int i = 0; i < mStatusStrings.size(); i++){
+		MyPrimitiveDrawer::DrawBitMapText(MyVec3f(UI_STRING_LEFT,
+			UI_STRING_STATUS_UPPER_BOTTOM - UI_STRING_STATUS_INTERVAL*i, 0), mStatusStrings[i], 0);
 	}
 
 	MyPrimitiveDrawer::PopProjectionMatrix();

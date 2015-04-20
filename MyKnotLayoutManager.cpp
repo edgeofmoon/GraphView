@@ -23,41 +23,37 @@ void MyKnotLayoutManager::SetKnotContainer(const MyKnotContainer* knotContainer)
 }
 
 void MyKnotLayoutManager::initLayout(){
-	//int r = (int)sqrtf(mKnotContainer.GetNumberOfKnot());
+	int n = mKnotContainer->GetNumberKnots();
+	int i = 0;
+	float distance = OBJECT_DISTANCE;
+	float offset = 0;
+	float y = 0;
+
 	/*
 	for(vector<MyKnot*>::const_iterator
 		itrKnot = mKnotContainer->Begin();
 		itrKnot != mKnotContainer->End();
 		itrKnot ++){
-		int x = i%2;
-		int y = i/2;
-		MyVec3f center(x*size-size,y*size-size/2,-distance);
-		(*itrKnot)->SetToDefault();
-		(*itrKnot)->Scale(3.00f);
-		(*itrKnot)->Translate(center);
-		i++;
-	}
-	*/
-	int n = mKnotContainer->GetNumberKnots();
-	int i = 0;
-	float size = SINGLEGRAPHSIZE;
-	if(n>1) size = DOUBLEGRAPHSIZE;
-	float distance = OBJECT_DISTANCE;
-	float space = 1760/n;
-	float offset = 0;
-	float y = 0;
-	for(vector<MyKnot*>::const_iterator
-		itrKnot = mKnotContainer->Begin();
-		itrKnot != mKnotContainer->End();
-		itrKnot ++){
-		float x = (i - (n/2.f))*space+offset;
-		MyVec3f center(x + space / 2, y, -distance);
+		MyVec3f center(0, y, -distance);
 		//MyVec3f center(0, 0, -distance);
 		(*itrKnot)->SetToDefault();
 		//(*itrKnot)->Scale(3);
 		(*itrKnot)->Translate(center);
 		i++;
 	}
+	*/
+
+	
+	MyVec3f center(0, 0, -distance);
+	vector<MyKnot*>::const_iterator itrKnot = mKnotContainer->Begin();
+	(*itrKnot)->SetToDefault();
+	(*itrKnot)->Scale(OBJECT_SCALE);
+	(*itrKnot)->Translate(center);
+	itrKnot++;
+	(*itrKnot)->SetToDefault();
+	(*itrKnot)->Scale(OBJECT_SCALE);
+	(*itrKnot)->Translate(MyVec3f(120, 0, -distance));
+
 }
 
 const MyKnot* MyKnotLayoutManager::GetKnot(int i) const{

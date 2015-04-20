@@ -324,6 +324,9 @@
     <ClCompile Include="configGen.cpp">
       <Filter>Test</Filter>
     </ClCompile>
+    <ClCompile Include="MyTractLegendKnot.cpp">
+      <Filter>Source Files\task</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyMatrix.h">
@@ -641,6 +644,9 @@
     <ClInclude Include="MyGlobalVariables.h">
       <Filter>Header Files\task</Filter>
     </ClInclude>
+    <ClInclude Include="MyTractLegendKnot.h">
+      <Filter>Header Files\task</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GraphView.rc">
@@ -658,6 +664,9 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="shader\tube.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="shader\tube_legend.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

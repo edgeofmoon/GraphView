@@ -24,16 +24,21 @@ MyGraphicsTool helper;
 MyTractTaskInstance* instance = 0;
 
 int pid = 0;
-int currentIdx = 0;
+int currentIdx = 12;
 MyArrayi configSeq;
+ofstream logFile;
 
 // suppose only one keyboard or mouse
 MyGenericEvent::MyMouseKey lastEventMouseKey = MyGenericEvent::MOUSE_KEY_LEFT;
 
 void nextTask(){
-	delete instance;
+	if (instance){
+		instance->Log(logFile);
+		delete instance;
+	}
 	currentIdx++;
 	if (currentIdx >= configSeq.size()){
+		logFile.close();
 		exit(1);
 	}
 	else if (currentIdx == configSeq.size()){
@@ -108,6 +113,7 @@ void MouseMoveFunc(int x, int y){
 void MouseWheelFunc(int button, int dir, int x, int y){
 	MyGenericEvent::MyKeyState keyState = toState(dir);
 	MyGenericEvent eve = MyGenericEvent::GenerateMouseKeyEvent(MyGenericEvent::MOUSE_WHEEL, keyState, x, y, modiferState());
+	instance->EventHandler(eve);
 	helper.Update();
 }
 
@@ -123,8 +129,10 @@ int main(int argc, char* argv[]){
 	
 	helper.Init(&argc,argv);
 
-	configSeq = MyArrayi::GetSequence(0, 504 / 3 - 1);
-	currentIdx = -1;
+	configSeq = MyArrayi::GetSequence(0, 504 / 4 - 1);
+	currentIdx -= 1;
+	logFile.open("logs\\" + MyString(pid) + ".txt");
+	MyTractTaskInstance::LogHeader(logFile);
 	nextTask();
 	/*
 	scene = new MyRenderScene;
@@ -169,6 +177,6 @@ int main(int argc, char* argv[]){
 	helper.RegisterIdleFunction(IdleFunc);
 	helper.RegisterMouseWheelFunction(MouseWheelFunc);
 	helper.Start();
-
+	logFile.close();
 	return 1;
 }

@@ -171,6 +171,7 @@
     </ClCompile>
     <ClCompile Include="configGen.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="DataGen.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -270,6 +271,7 @@
     <ClCompile Include="MyTextureHelper.cpp" />
     <ClCompile Include="MyTimer.cpp" />
     <ClCompile Include="MyTrackBall.cpp" />
+    <ClCompile Include="MyTractLegendKnot.cpp" />
     <ClCompile Include="MyTracts.cpp" />
     <ClCompile Include="MyTractsKnot.cpp" />
     <ClCompile Include="MyTractTaskInstance.cpp" />
@@ -368,6 +370,7 @@
     <ClInclude Include="MyTextureHelper.h" />
     <ClInclude Include="MyTimer.h" />
     <ClInclude Include="MyTrackBall.h" />
+    <ClInclude Include="MyTractLegendKnot.h" />
     <ClInclude Include="MyTracts.h" />
     <ClInclude Include="MyTractsKnot.h" />
     <ClInclude Include="MyTractTaskInstance.h" />
@@ -401,6 +404,7 @@
     <None Include="shader\tube.vert" />
     <None Include="shader\depthline.frag" />
     <None Include="shader\depthline.vert" />
+    <None Include="shader\tube_legend.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

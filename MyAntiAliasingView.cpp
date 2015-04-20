@@ -26,13 +26,13 @@ void MyAntiAliasingView::Show(){
 		mTextTexture = MyPrimitiveDrawer::GenerateTexture();
 	}
 
-	bool init = false;
-	if(!init){
-		glewInit();
-		init = true;
-	}
+	//bool init = false;
+	//if(!init){
+	//	glewInit();
+	//	init = true;
+	//}
 
-	GLuint fbo, render_buf;
+	GLuint fbo, render_buf, depth_buf;
 	glGenFramebuffers(1,&fbo);
 	glGenRenderbuffers(1,&render_buf);
 	glBindRenderbuffer(GL_RENDERBUFFER, render_buf);
@@ -40,16 +40,22 @@ void MyAntiAliasingView::Show(){
 	glBindFramebuffer(GL_FRAMEBUFFER,fbo);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buf);
 
+	glGenRenderbuffers(1, &depth_buf);
+	glBindRenderbuffer(GL_RENDERBUFFER, depth_buf);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mTextureWidth, mTextureHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_buf);
+
 	//Before drawing
 	glBindFramebuffer(GL_RENDERBUFFER,fbo);
 	MyPrimitiveDrawer::ClearFrameBuffer();
 	//MyPrimitiveDrawer::PushMatrix();
 	//MyPrimitiveDrawer::PushProjectionMatrix();
-	MyVec4i viewport = MyPrimitiveDrawer::GetViewport();
-	MyPrimitiveDrawer::SetViewport(MyVec4i(0,0, mWidth*DETAIL_X, mHeight*DETAIL_Y));
+	MyVec4i viewport = mViewport;
+	mViewport = MyVec4i(0, 0, mWidth*DETAIL_X, mHeight*DETAIL_Y);
 	//MyPrimitiveDrawer::SetToByPixelMatrix(mWidth, mHeight, 0, 1000);
 	MyView::Show();
 	MyPrimitiveDrawer::SetViewport(viewport);
+	mViewport = viewport;
 	//MyPrimitiveDrawer::PopMatrix();
 	//MyPrimitiveDrawer::PopProjectionMatrix();
 
@@ -68,7 +74,8 @@ void MyAntiAliasingView::Show(){
 
 	//At deinit:
 	glDeleteFramebuffers(1,&fbo);
-	glDeleteRenderbuffers(1,&render_buf);
+	glDeleteRenderbuffers(1, &render_buf);
+	glDeleteRenderbuffers(1, &depth_buf);
 
 	// Return to onscreen rendering:
 	glBindFramebuffer(GL_RENDERBUFFER,0);
@@ -101,7 +108,6 @@ void MyAntiAliasingView::Show(){
 
 	MyPrimitiveDrawer::PopMatrix();
 	MyPrimitiveDrawer::PopProjectionMatrix();
-	MyPrimitiveDrawer::DisableAlplaBlending();
 	MyPrimitiveDrawer::UnbindTexture2D(mTextTexture);
 	MyPrimitiveDrawer::DisableTexture2D();
 }

@@ -10,6 +10,7 @@
 class MyScene;
 class MyView;
 class MyTractsKnot;
+class MyTractLegendKnot;
 class MyBoxKnot;
 class MyTractTaskInterface;
 
@@ -52,11 +53,13 @@ public:
 	int EventHandler(MyGenericEvent& eve);
 
 protected:
+	static MyString mDecimer;
 	int mParticipantIndex;
 	int mTrialIndex;
 	int mTotalTrials;
 
 	MyTimer mTimer;
+
 
 	MyScene* mScene;
 	MyView* mView;
@@ -66,6 +69,7 @@ protected:
 	MyTractsKnot* mTractKnot;
 	MyBoxKnot* mBoxKnot1;
 	MyBoxKnot* mBoxKnot2;
+	MyTractLegendKnot* mLegendKnot;
 	float mBeta;
 	MyProjection::MyProjectionEnum mProjectionMethod;
 
@@ -74,7 +78,6 @@ protected:
 	// log
 	int mUserAnswerIndex;
 	int mCorrectAnswerIndex;
-
 
 	int mShowMode;
 	bool mIsEmpty;

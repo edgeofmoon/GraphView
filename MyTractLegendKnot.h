@@ -1,18 +1,18 @@
 #pragma once
-#include "myknot.h"
-#include "MyTracts.h"
+#include "MyKnot.h"
+#include "MyColor4.h"
 
-class MyTractsKnot :
+class MyTractLegendKnot :
 	public MyKnot
 {
 public:
-	MyTractsKnot(void);
-	~MyTractsKnot(void);
+	MyTractLegendKnot();
+	~MyTractLegendKnot();
 
+	void SetNumSegments(int n);
+	void SetValueRange(const MyVec2f& valueRange);
 	void SetScreenSpace(bool bs){ mbScreenSpace = bs; };
 	void SetBeta(float beta){ mBeta = beta; };
-	void SetTracts(const MyTracts* tracts);
-	void SetNumSegments(int n);
 
 	virtual void Build();
 	virtual void Show();
@@ -20,33 +20,22 @@ public:
 	virtual bool SeeAny();
 	virtual MyGenericNode* MakeSeeWhat();
 
-	MyVec2f GetValueRange() const{ return MyVec2f(mMinValue, mMaxValue); };
-	MyArrayf GetAvgValues() const { return mAvgValues; };
-
 protected:
-	virtual int mousePressEventHandler(MyGenericEvent& eve);
-	virtual int mouseReleaseEventHandler(MyGenericEvent& eve);
-	virtual int mouseMoveEventHandler(MyGenericEvent& eve);
-	virtual int idleEventHandler(MyGenericEvent& eve);
-	virtual int windowResizeEventHandler(MyGenericEvent& eve);
-
-	virtual void responseBroadcast(const MyKnot* source, int type);
 
 	void ComputeGeometry();
 	void LoadBuffer();
 	void LoadShader();
 
-	MyArrayf mAvgValues;
-	float mMinValue;
-	float mMaxValue;
 	float mapToSize(float s);
 	float mBeta;
 
-	const MyTracts* mTracts;
 	int mFaces;
+	float mMinValue;
+	float mMaxValue;
+	MyVec3f mStartPoint;
+	MyVec3f mEndPoint;
 
 	int mDisplayList;
-	MyArrayi mIdxOffset;
 
 	MyArray3f mVertices;
 	MyArray3f mNormals;
