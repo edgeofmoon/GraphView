@@ -1,5 +1,6 @@
 #include "MyKnotLayoutManager.h"
 #include "VisConfig.h"
+#include "MyGlobalVariables.h"
 #include <algorithm>
 #include <cmath>
 
@@ -41,7 +42,7 @@ void MyKnotLayoutManager::initLayout(){
 	int i = 0;
 	float size = SINGLEGRAPHSIZE;
 	if(n>1) size = DOUBLEGRAPHSIZE;
-	float distance = 930.f;
+	float distance = OBJECT_DISTANCE;
 	float space = 1760/n;
 	float offset = 0;
 	float y = 0;
@@ -53,7 +54,7 @@ void MyKnotLayoutManager::initLayout(){
 		MyVec3f center(x + space / 2, y, -distance);
 		//MyVec3f center(0, 0, -distance);
 		(*itrKnot)->SetToDefault();
-		(*itrKnot)->Scale(3);
+		//(*itrKnot)->Scale(3);
 		(*itrKnot)->Translate(center);
 		i++;
 	}

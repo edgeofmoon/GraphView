@@ -32,6 +32,9 @@ public:
 	MyTractTaskInstance(int pid, int tid, int total);
 	~MyTractTaskInstance();
 
+	void SetConfigFile(const MyString& fn);
+	void SetParticipantIndex(int pid);
+	void SetTotalTrialNumber(int tn);
 
 	virtual void Build();
 	virtual void Show();
@@ -39,14 +42,12 @@ public:
 	virtual bool SeeAny();
 	virtual MyGenericNode* MakeSeeWhat();
 
-	void SetConfigFile(const MyString& fn);
-	void SetParticipantIndex(int pid);
-	void SetTotalTrialNumber(int tn);
 
 	static void LogHeader(std::ostream& out);
 	void Log(std::ostream& out);
 
 	bool IsEmpty() const { return mIsEmpty; };
+	void SetEmpty(bool bEmpty){ mIsEmpty = bEmpty; };
 
 	int EventHandler(MyGenericEvent& eve);
 
@@ -60,6 +61,7 @@ protected:
 	MyScene* mScene;
 	MyView* mView;
 
+	void updateViewProjection(int width, int height);
 	MyString mConfigFileName;
 	MyTractsKnot* mTractKnot;
 	MyBoxKnot* mBoxKnot1;

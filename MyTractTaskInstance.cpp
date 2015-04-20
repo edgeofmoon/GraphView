@@ -95,7 +95,11 @@ void MyTractTaskInstance::Build(){
 	MyKnot::Connect(mTractKnot, mBoxKnot1);
 	MyKnot::Connect(mTractKnot, mBoxKnot2);
 
+	mTractKnot->SetBeta(mBeta);
 	mTractKnot->Build();
+
+	MyVec4i viewport = MyGraphicsTool::GetViewport();
+	mTractKnot->GetTrackBall().Reshape(viewport[2], viewport[3]);
 
 	mInterface = new MyTractTaskInterface;
 	mInterface->SetEmpty(mIsEmpty);
@@ -103,24 +107,18 @@ void MyTractTaskInstance::Build(){
 
 	mView = new MyView;
 	mScene = new MyScene;
+	mScene->AddKnot(mTractKnot);
 	mView->SetScene(mScene);
 	mScene->SetView(mView);
+	mScene->Build();
+	mView->Build();
 	mView->Build();
 
-	switch (mProjectionMethod)
-	{
-		case MyProjection::PERSPECTIVE:
-		case MyProjection::SCREENSPACE:
-			mView->SetProjectionMatrix(MyMatrixf::PerspectiveMatrix(
-				PERSPECTIVE_FOV, WINDOW_ASPECT, VIEW_NEAR, VIEW_FAR));
-			break;
-		case MyProjection::INVALID:
-		case MyProjection::ORTHOGONAL:
-		default:
-			mView->SetModelViewMatrix(MyMatrixf::OrthographicMatrix(
-				VIEW_LEFT, VIEW_RIGHT,VIEW_BOTTOM, VIEW_RIGHT, VIEW_NEAR, VIEW_FAR));
-			break;
-	}
+	updateViewProjection(1024, 768);
+
+	mInterface = new MyTractTaskInterface;
+	mInterface->SetEnable(true);
+	mInterface->Build();
 }
 
 void MyTractTaskInstance::Show(){
@@ -133,7 +131,8 @@ void MyTractTaskInstance::Show(){
 void MyTractTaskInstance::Destory(){
 	SafeFreeObject(mScene);
 	SafeFreeObject(mView);
-	SafeFreeObject(mTractKnot);
+	// scene will destory tractknot
+	//SafeFreeObject(mTractKnot);
 	SafeFreeObject(mBoxKnot1);
 	SafeFreeObject(mBoxKnot2);
 	SafeFreeObject(mInterface);
@@ -177,7 +176,12 @@ int MyTractTaskInstance::EventHandler(MyGenericEvent& eve){
 	int UIHandleRst = mInterface->EventHandler(eve);
 
 	if (UIHandleRst == 0){
-		return mView->EventHandler(eve);
+		mView->SetViewport(MyVec4i(0,0,eve.GetWindowWidth(), eve.GetWindowHeight()));
+		int viewHrst = mView->EventHandler(eve);
+		if (eve.GetEventSource() == MyGenericEvent::WINDOW_RESIZE){
+			updateViewProjection(eve.GetWindowWidth(), eve.GetWindowHeight());
+		}
+		return viewHrst;
 	}
 
 	// finished
@@ -187,4 +191,22 @@ int MyTractTaskInstance::EventHandler(MyGenericEvent& eve){
 		mUserAnswerIndex = mInterface->GetUserSelection();
 	}
 	return UIHandleRst;
+}
+
+void MyTractTaskInstance::updateViewProjection(int width, int height){
+	float aspect = width / (float)height;
+	switch (mProjectionMethod)
+	{
+	case MyProjection::PERSPECTIVE:
+	case MyProjection::SCREENSPACE:
+		mView->SetProjectionMatrix(MyMatrixf::PerspectiveMatrix(
+			PERSPECTIVE_FOV, aspect, VIEW_NEAR, VIEW_FAR));
+		break;
+	case MyProjection::INVALID:
+	case MyProjection::ORTHOGONAL:
+	default:
+		mView->SetProjectionMatrix(MyMatrixf::OrthographicMatrix(
+			VIEW_BOTTOM*aspect, VIEW_TOP*aspect, VIEW_BOTTOM, VIEW_TOP, VIEW_NEAR, VIEW_FAR));
+		break;
+	}
 }

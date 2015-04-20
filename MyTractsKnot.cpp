@@ -7,6 +7,7 @@
 #include "MyGraphicsTool.h"
 #include "MyPrimitiveDrawer.h"
 #include "MyBoxKnot.h"
+#include "MyGlobalVariables.h"
 #include <iostream>
 using namespace std;
 
@@ -123,6 +124,20 @@ void MyTractsKnot::Build(){
 	LoadBuffer();
 }
 
+
+float MyTractsKnot::mapToSize(float s){
+	if (mBeta > 0){
+		float size = SCALE_MAX*powf(s, 1 / mBeta);
+		return max(size, (float)SCALE_MIN);
+	}
+	else{
+		float b = SCALE_MAX / (1 - LOG_BASE);
+		float k = -b;
+		float size = k*exp(s) + b;
+		return max(size, (float)SCALE_MIN);
+	}
+}
+
 void MyTractsKnot::ComputeGeometry(){
 	int currentIdx = 0;
 	mIdxOffset.clear();
@@ -149,7 +164,7 @@ void MyTractsKnot::ComputeGeometry(){
 		minValue = std::min(minValue, tmin);
 		maxValue = std::max(maxValue, tmax);
 	}
-	if (minValue < maxValue){
+	if (minValue > maxValue){
 		std::swap(minValue, maxValue);
 	}
 	float rangeValue = maxValue - minValue;
@@ -183,7 +198,8 @@ void MyTractsKnot::ComputeGeometry(){
 	
 		for(int i = 0;i<npoints;i++){
 			MyVec3f p = mTracts->GetCoord(it,i);
-			float size = (mTracts->GetValue(it, i) - minValue) / rangeValue*0.4;
+			float size = (mTracts->GetValue(it, i) - minValue) / rangeValue;
+			size = mapToSize(size);
 			//float size = 0;
 			MyVec3f d;
 			if(i==npoints-1){

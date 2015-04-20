@@ -9,6 +9,7 @@ public:
 	MyTractsKnot(void);
 	~MyTractsKnot(void);
 
+	void SetBeta(float beta){ mBeta = beta; };
 	void SetTracts(const MyTracts* tracts);
 	void SetNumSegments(int n);
 
@@ -30,6 +31,9 @@ protected:
 	void ComputeGeometry();
 	void LoadBuffer();
 	void LoadShader();
+
+	float mapToSize(float s);
+	float mBeta;
 
 	const MyTracts* mTracts;
 	int mFaces;
